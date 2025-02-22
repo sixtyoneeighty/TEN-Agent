@@ -135,10 +135,10 @@ export const toolModuleRegistry: Record<string, ModuleRegistry.ToolModule> = {
         type: ModuleRegistry.ModuleType.TOOL,
         label: "WeatherAPI Tool",
     },
-    bingsearch_tool_python: {
-        name: "bingsearch_tool_python",
+    tavilysearch_tool_python: {
+        name: "tavilysearch_tool_python",
         type: ModuleRegistry.ModuleType.TOOL,
-        label: "BingSearch Tool",
+        label: "Tavily Search Tool",
     },
     vision_tool_python: {
         name: "vision_tool_python",
@@ -160,8 +160,8 @@ export const moduleRegistry: Record<string, ModuleRegistry.Module> = {
 }
 
 export const compatibleTools: Record<string, string[]> = {
-    openai_chatgpt_python: ["vision_tool_python", "weatherapi_tool_python", "bingsearch_tool_python", "openai_image_generate_tool"],
-    openai_v2v_python: ["weatherapi_tool_python", "bingsearch_tool_python", "openai_image_generate_tool"],
-    gemini_v2v_python: ["weatherapi_tool_python", "bingsearch_tool_python", "openai_image_generate_tool"],
-    glm_v2v_python: ["weatherapi_tool_python", "bingsearch_tool_python", "openai_image_generate_tool"],
+    openai_chatgpt_python: ["vision_tool_python", "weatherapi_tool_python", "tavilysearch_tool_python", "openai_image_generate_tool"],
+    openai_v2v_python: ["weatherapi_tool_python", "tavilysearch_tool_python", "openai_image_generate_tool"],
+    gemini_v2v_python: ["weatherapi_tool_python", "tavilysearch_tool_python", "openai_image_generate_tool"],
+    glm_v2v_python: ["weatherapi_tool_python", "tavilysearch_tool_python", "openai_image_generate_tool"],
 }

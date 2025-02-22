@@ -1,0 +1,12 @@
+{
+    "type": "extension",
+    "name": "tavilysearch_tool_python",
+    "version": "0.1.0",
+    "description": "Tavily Search Tool Extension",
+    "author": "original author",
+    "license": "original license",
+    "dependencies": {
+        "ten": ">=0.1.0",
+        "tavily-python": ">=0.1.0"
+    }
+} 

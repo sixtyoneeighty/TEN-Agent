@@ -27,14 +27,14 @@ TOOL_REGISTER_PROPERTY_DESCRIPTON = "description"
 TOOL_REGISTER_PROPERTY_PARAMETERS = "parameters"
 TOOL_CALLBACK = "callback"
 
-TOOL_NAME = "bing_search"
-TOOL_DESCRIPTION = "Use Bing.com to search for latest information. Call this function if you are not sure about the answer."
+TOOL_NAME = "tavily_search"
+TOOL_DESCRIPTION = "Use Tavily API to search for latest information. Call this function if you are not sure about the answer."
 TOOL_PARAMETERS = {
     "type": "object",
     "properties": {
         "query": {
             "type": "string",
-            "description": "The search query to call Bing Search.",
+            "description": "The search query to call Tavily Search.",
         }
     },
     "required": ["query"],
@@ -42,29 +42,10 @@ TOOL_PARAMETERS = {
 
 PROPERTY_API_KEY = "api_key"  # Required
 
-DEFAULT_BING_SEARCH_ENDPOINT = "https://api.bing.microsoft.com/v7.0/search"
-
-# BING_SEARCH_ENDPOINT is the default endpoint for Bing Web Search API.
-# Currently There are two web-based Bing Search services available on Azure,
-# i.e. Bing Web Search[1] and Bing Custom Search[2]. Compared to Bing Custom Search,
-# Both services that provides a wide range of search results, while Bing Custom
-# Search requires you to provide an additional custom search instance, `customConfig`.
-# Both services are available for BingSearchAPIWrapper.
-# History of Azure Bing Search API:
-# Before shown in Azure Marketplace as a separate service, Bing Search APIs were
-# part of Azure Cognitive Services, the endpoint of which is unique, and the user
-# must specify the endpoint when making a request. After transitioning to Azure
-# Marketplace, the endpoint is standardized and the user does not need to specify
-# the endpoint[3].
-# Reference:
-#  1. https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/overview
-#  2. https://learn.microsoft.com/en-us/bing/search-apis/bing-custom-search/overview
-#  3. https://azure.microsoft.com/en-in/updates/bing-search-apis-will-transition-from-azure-cognitive-services-to-azure-marketplace-on-31-october-2023/
-
-class BingSearchToolConfig(BaseConfig):
+class TavilySearchToolConfig(BaseConfig):
     api_key: str = ""
 
-class BingSearchToolExtension(AsyncLLMToolBaseExtension):
+class TavilySearchToolExtension(AsyncLLMToolBaseExtension):
 
     def __init__(self, name: str) -> None:
         super().__init__(name)
@@ -81,7 +62,7 @@ class BingSearchToolExtension(AsyncLLMToolBaseExtension):
         ten_env.log_debug("on_start")
         await super().on_start(ten_env)
 
-        self.config = await BingSearchToolConfig.create_async(ten_env=ten_env)
+        self.config = await TavilySearchToolConfig.create_async(ten_env=ten_env)
 
         if not self.config.api_key:
             ten_env.log_info("API key is missing, exiting on_start")
@@ -89,16 +70,13 @@ class BingSearchToolExtension(AsyncLLMToolBaseExtension):
 
     async def on_stop(self, ten_env: AsyncTenEnv) -> None:
         ten_env.log_debug("on_stop")
-
-        # clean up resources
         if self.session and not self.session.closed:
             await self.session.close()
-            self.session = None  # Ensure it can't be reused accidentally
+            self.session = None
 
     async def on_cmd(self, ten_env: AsyncTenEnv, cmd: Cmd) -> None:
         cmd_name = cmd.get_name()
-        ten_env.log_debug("on_cmd name {}".format(cmd_name))
-
+        ten_env.log_debug(f"on_cmd name {cmd_name}")
         await super().on_cmd(ten_env, cmd)
 
     def get_tool_metadata(self, ten_env: AsyncTenEnv) -> list[LLMToolMetadata]:
@@ -110,7 +88,7 @@ class BingSearchToolExtension(AsyncLLMToolBaseExtension):
                     LLMToolMetadataParameter(
                         name="query",
                         type="string",
-                        description="The search query to call Bing Search.",
+                        description="The search query to call Tavily Search.",
                         required=True,
                     ),
                 ],
@@ -122,22 +100,18 @@ class BingSearchToolExtension(AsyncLLMToolBaseExtension):
     ) -> LLMToolResult | None:
         if name == TOOL_NAME:
             result = await self._do_search(ten_env, args)
-            # result = LLMCompletionContentItemText(text="I see something")
             return {"content": json.dumps(result)}
 
     async def _do_search(self, ten_env: AsyncTenEnv, args: dict) -> Any:
         if "query" not in args:
-            raise ValueError("Failed to get property")
-
+            raise ValueError("Failed to get property 'query'")
         query = args["query"]
         snippets = []
-        results = await self._bing_search_results(ten_env, query, count=self.k)
+        results = await self._tavily_search_results(ten_env, query)
         if len(results) == 0:
-            return "No good Bing Search Result was found"
-
+            return "No good Tavily Search Result was found"
         for result in results:
-            snippets.append(result["snippet"])
-
+            snippets.append(result["content"])  # Tavily uses 'content' instead of 'snippet'
         return snippets
 
     async def _initialize_session(self, ten_env: AsyncTenEnv):
@@ -145,23 +119,26 @@ class BingSearchToolExtension(AsyncLLMToolBaseExtension):
             ten_env.log_debug("Initializing new session")
             self.session = aiohttp.ClientSession()
 
-    async def _bing_search_results(self, ten_env: AsyncTenEnv, search_term: str, count: int) -> List[dict]:
+    async def _tavily_search_results(self, ten_env: AsyncTenEnv, search_term: str) -> List[dict]:
         await self._initialize_session(ten_env)
-        headers = {"Ocp-Apim-Subscription-Key": self.config.api_key}
-        params = {
-            "q": search_term,
-            "count": count,
-            "textDecorations": "true",
-            "textFormat": "HTML",
-        }
-
-        async with self.session as session:
-            async with session.get(
-                DEFAULT_BING_SEARCH_ENDPOINT, headers=headers, params=params
-            ) as response:
-                response.raise_for_status()
-                search_results = await response.json()
-
-        if "webPages" in search_results:
-            return search_results["webPages"]["value"]
-        return []
+        
+        # Create Tavily client instance
+        from tavily import TavilyClient
+        client = TavilyClient(api_key=self.config.api_key)
+        
+        try:
+            # Make the search request
+            response = await client.search(
+                query=search_term,
+                max_results=self.k,
+                search_depth="basic"
+            )
+            
+            # Return the results
+            if "results" in response:
+                return response["results"]
+            return []
+            
+        except Exception as e:
+            ten_env.log_error(f"Tavily search error: {str(e)}")
+            return []

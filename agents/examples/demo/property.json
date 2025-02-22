@@ -460,11 +460,11 @@
           },
           {
             "type": "extension",
-            "name": "bingsearch_tool_python",
-            "addon": "bingsearch_tool_python",
+            "name": "tavilysearch_tool_python",
+            "addon": "tavilysearch_tool_python",
             "extension_group": "default",
             "property": {
-              "api_key": "${env:BING_API_KEY|}"
+              "api_key": "${env:TAVILY_API_KEY|}"
             }
           }
         ],
@@ -542,7 +542,7 @@
                     "extension": "vision_tool_python"
                   },
                   {
-                    "extension": "bingsearch_tool_python"
+                    "extension": "tavilysearch_tool_python"
                   }
                 ]
               }
@@ -647,7 +647,7 @@
             ]
           },
           {
-            "extension": "bingsearch_tool_python",
+            "extension": "tavilysearch_tool_python",
             "cmd": [
               {
                 "name": "tool_register",
@@ -708,11 +708,11 @@
           },
           {
             "type": "extension",
-            "name": "bingsearch_tool_python",
-            "addon": "bingsearch_tool_python",
+            "name": "tavilysearch_tool_python",
+            "addon": "tavilysearch_tool_python",
             "extension_group": "default",
             "property": {
-              "api_key": "${env:BING_API_KEY|}"
+              "api_key": "${env:_API_KEY|}"
             }
           },
           {
@@ -780,7 +780,7 @@
                 "name": "tool_call",
                 "dest": [
                   {
-                    "extension": "bingsearch_tool_python"
+                    "extension": "tavilysearch_tool_python"
                   },
                   {
                     "extension": "weatherapi_tool_python"
@@ -823,7 +823,7 @@
             ]
           },
           {
-            "extension": "bingsearch_tool_python",
+            "extension": "tavilysearch_tool_python",
             "cmd": [
               {
                 "name": "tool_register",
@@ -926,11 +926,11 @@
           },
           {
             "type": "extension",
-            "name": "bingsearch_tool_python",
-            "addon": "bingsearch_tool_python",
+            "name": "tavilysearch_tool_python",
+            "addon": "tavilysearch_tool_python",
             "extension_group": "tools",
             "property": {
-              "api_key": "${env:BING_API_KEY}"
+              "api_key": "${env:TAVILY_API_KEY}"
             }
           }
         ],
@@ -972,7 +972,7 @@
             ]
           },
           {
-            "extension": "bingsearch_tool_python",
+            "extension": "tavilysearch_tool_python",
             "cmd": [
               {
                 "name": "tool_register",
@@ -1002,7 +1002,7 @@
                     "extension": "weatherapi_tool_python"
                   },
                   {
-                    "extension": "bingsearch_tool_python"
+                    "extension": "tavilysearch_tool_python"
                   }
                 ]
               },

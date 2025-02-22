@@ -1,6 +1,6 @@
 {
   "type": "extension",
-  "name": "bingsearch_tool_python",
+  "name": "tavilysearch_tool_python",
   "version": "0.1.0",
   "dependencies": [
     {

@@ -565,8 +565,8 @@
           {
             "type": "extension",
             "extension_group": "tools",
-            "addon": "bingsearch_tool_python",
-            "name": "bingsearch_tool_python",
+            "addon": "tavilysearch_tool_python",
+            "name": "tavilysearch_tool_python",
             "property": {
               "api_key": "${env:BING_API_KEY}"
             }
@@ -623,7 +623,7 @@
             ]
           },
           {
-            "extension": "bingsearch_tool_python",
+            "extension": "tavilysearch_tool_python",
             "cmd": [
               {
                 "name": "tool_register",

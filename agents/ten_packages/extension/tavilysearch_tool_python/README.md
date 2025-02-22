@@ -1,4 +1,4 @@
-# bingsearch_tool_python
+# tavilysearch_tool_python
 
 <!-- brief introduction for the extension -->
 
